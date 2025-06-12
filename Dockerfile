@@ -34,8 +34,9 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Configure Apache
 COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html \
+# Create necessary directories and set permissions
+RUN mkdir -p /var/www/html/var/cache /var/www/html/var/log /var/www/html/var/sessions \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 777 /var/www/html/var
 
