@@ -12,14 +12,14 @@ fi
 # Wait for database to be ready (with timeout)
 if [ "$SKIP_DB" = false ]; then
     echo "Waiting for database to be ready..."
-    TIMEOUT=60
+    TIMEOUT=30
     COUNTER=0
     until php bin/console doctrine:query:sql "SELECT 1" > /dev/null 2>&1; do
         echo "Database is not ready yet. Waiting... ($COUNTER/$TIMEOUT)"
-        sleep 2
+        sleep 3
         COUNTER=$((COUNTER + 1))
         if [ $COUNTER -ge $TIMEOUT ]; then
-            echo "Database connection timeout. Continuing without database setup."
+            echo "Database connection timeout after 90 seconds. Continuing without database setup."
             SKIP_DB=true
             break
         fi
