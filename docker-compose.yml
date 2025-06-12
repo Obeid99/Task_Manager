@@ -6,6 +6,7 @@ services:
     environment:
       - APP_ENV=prod
       - DATABASE_URL=mysql://symfony:secret@database:3306/symfony
+      - MESSENGER_TRANSPORT_DSN=doctrine://default
     depends_on:
       - database
     volumes:

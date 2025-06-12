@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set default environment variables if not set
+export MESSENGER_TRANSPORT_DSN=${MESSENGER_TRANSPORT_DSN:-doctrine://default}
+
 # Check if DATABASE_URL is set
 if [ -z "$DATABASE_URL" ]; then
     echo "WARNING: DATABASE_URL not set. Skipping database operations."
