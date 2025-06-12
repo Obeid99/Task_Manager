@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+DEPLOYMENT.md
+*.md
+
+# Development files
+.env.local
+.env.test
+.env.dev
+
+# Node modules (if any)
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+var/log/
+
+# Cache
+var/cache/
+
+# Test files
+tests/
+phpunit.xml
+
+# Deployment scripts (not needed in container)
+deploy.sh
+deploy.bat
+
+# Local uploads (will be created in container)
+public/uploads/*
