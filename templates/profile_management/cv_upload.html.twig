@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Upload CV/Resume{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-upload me-2"></i>Upload CV/Resume
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                    
+                    <div class="mb-4">
+                        <div class="upload-area border-2 border-dashed rounded p-4 text-center" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h5>Drag & Drop your CV here</h5>
+                            <p class="text-muted mb-3">or click to browse files</p>
+                            {{ form_widget(form.cvFile, {'attr': {'class': 'form-control d-none'}}) }}
+                            <button type="button" class="btn btn-outline-primary" id="chooseFileBtn">
+                                <i class="fas fa-folder-open me-2"></i>Choose File
+                            </button>
+                        </div>
+                        {{ form_errors(form.cvFile) }}
+                        <div class="form-text">{{ form_help(form.cvFile) }}</div>
+                    </div>
+
+                    <div id="filePreview" class="mb-3" style="display: none;">
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-file-pdf fa-2x me-3"></i>
+                            <div>
+                                <strong id="fileName"></strong><br>
+                                <small id="fileSize" class="text-muted"></small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-auto" onclick="clearFile()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                            <i class="fas fa-upload me-2"></i>Upload CV
+                        </button>
+                        <a href="{{ path('app_user_profile') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .upload-area {
+            border-color: #dee2e6 !important;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary-color) !important;
+            background-color: #f8f9fa;
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary-color) !important;
+            background-color: #e3f2fd;
+        }
+        
+        .file-icon {
+            font-size: 2rem;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.querySelector('input[type="file"]');
+            const filePreview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const chooseFileBtn = document.getElementById('chooseFileBtn');
+
+            // Click to upload
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            chooseFileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            // File input change
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+
+            function handleFileSelect(file) {
+                // Validate file type
+                const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Please select a valid CV file (PDF, DOC, or DOCX)');
+                    clearFile();
+                    return;
+                }
+
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size must be less than 10MB');
+                    clearFile();
+                    return;
+                }
+
+                // Show file preview
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                filePreview.style.display = 'block';
+                uploadBtn.disabled = false;
+                
+                // Hide upload area
+                uploadArea.style.display = 'none';
+            }
+
+            window.clearFile = function() {
+                fileInput.value = '';
+                filePreview.style.display = 'none';
+                uploadArea.style.display = 'block';
+                uploadBtn.disabled = true;
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        });
+    </script>
+{% endblock %}

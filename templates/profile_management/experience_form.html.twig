@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-briefcase me-2"></i>{{ title }}
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.company) }}
+                            {{ form_widget(form.company) }}
+                            {{ form_errors(form.company) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.position) }}
+                            {{ form_widget(form.position) }}
+                            {{ form_errors(form.position) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.employmentType) }}
+                            {{ form_widget(form.employmentType) }}
+                            {{ form_errors(form.employmentType) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.location) }}
+                            {{ form_widget(form.location) }}
+                            {{ form_errors(form.location) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.startDate) }}
+                            {{ form_widget(form.startDate) }}
+                            {{ form_errors(form.startDate) }}
+                        </div>
+                        <div class="col-md-6 mb-3" id="endDateField">
+                            {{ form_label(form.endDate) }}
+                            {{ form_widget(form.endDate) }}
+                            {{ form_errors(form.endDate) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="form-check">
+                                {{ form_widget(form.isCurrentPosition) }}
+                                {{ form_label(form.isCurrentPosition) }}
+                            </div>
+                            {{ form_errors(form.isCurrentPosition) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            {{ form_label(form.description) }}
+                            {{ form_widget(form.description) }}
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" name="save_and_return" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Experience
+                        </button>
+                        <button type="submit" name="save_and_add_another" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Save & Add Another
+                        </button>
+                        <a href="{{ path('app_user_profile') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Hide end date when current position is checked
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPositionCheckbox = document.querySelector('#work_experience_form_isCurrentPosition');
+            const endDateField = document.querySelector('#endDateField');
+            
+            function toggleEndDate() {
+                if (currentPositionCheckbox.checked) {
+                    endDateField.style.display = 'none';
+                    document.querySelector('#work_experience_form_endDate').value = '';
+                } else {
+                    endDateField.style.display = 'block';
+                }
+            }
+            
+            currentPositionCheckbox.addEventListener('change', toggleEndDate);
+            toggleEndDate(); // Initial state
+        });
+    </script>
+{% endblock %}

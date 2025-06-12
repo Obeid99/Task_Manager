@@ -1,0 +1,35 @@
+# Performance optimization configuration for JEMS Task Manager
+
+# Framework optimizations
+framework:
+    # Session optimization
+    session:
+        cookie_lifetime: 3600
+        gc_maxlifetime: 3600
+
+    # Asset optimization
+    assets:
+        version: 'v1.0'
+
+# Twig optimizations
+twig:
+    # Optimize whitespace
+    optimizations: -1
+    # Enable strict variables in production
+    strict_variables: '%kernel.debug%'
+
+# Production optimizations
+when@prod:
+    doctrine:
+        orm:
+            # Disable proxy generation in production
+            auto_generate_proxy_classes: false
+            # Set proxy directory
+            proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
+
+# Services optimization
+services:
+    # User profile cache service with dedicated cache pool
+    App\Service\UserProfileCacheService:
+        arguments:
+            $userProfileCache: '@cache.user_profile_cache'

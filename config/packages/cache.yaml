@@ -1,19 +1,28 @@
 framework:
     cache:
         # Unique name of your app: used to compute stable namespaces for cache keys.
-        #prefix_seed: your_vendor_name/app_name
+        prefix_seed: jems_task_manager
 
         # The "app" cache stores to the filesystem by default.
         # The data in this cache should persist between deploys.
-        # Other options include:
+        app: cache.adapter.filesystem
 
-        # Redis
-        #app: cache.adapter.redis
-        #default_redis_provider: redis://localhost
+        # Performance cache pools for Doctrine
+        pools:
+            doctrine.query_cache_pool:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 3600
+            doctrine.result_cache_pool:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 1800
+            doctrine.metadata_cache_pool:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 86400
 
-        # APCu (not recommended with heavy random-write workloads as memory fragmentation can cause perf issues)
-        #app: cache.adapter.apcu
-
-        # Namespaced pools use the above "app" backend by default
-        #pools:
-            #my.dedicated.cache: null
+            # Application-specific cache pools
+            user_profile_cache:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 3600
+            task_cache:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 1800

@@ -1,3 +1,5 @@
+/* Minimal CSS for performance */
 body {
-    background-color: skyblue;
+    margin: 0;
+    padding: 0;
 }

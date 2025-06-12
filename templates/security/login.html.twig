@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in{% endblock %}
+
+{% block body %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-center border-0" style="background: var(--brand-gradient); color: white;">
+                    <div class="logo-circle mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                        <span>J</span>
+                    </div>
+                    <h1 class="h4 mb-1">Welcome Back</h1>
+                    <p class="mb-0 opacity-75">Sign in to JEMS Task Manager</p>
+                </div>
+                <div class="card-body p-4">
+                    {% if error %}
+                        <div class="alert alert-danger border-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="alert alert-info border-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}" class="alert-link">Logout</a>
+                        </div>
+                    {% endif %}
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="inputEmail" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2 text-muted"></i>Email Address
+                            </label>
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail"
+                                   class="form-control form-control-lg" autocomplete="email" required autofocus
+                                   placeholder="Enter your email">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="inputPassword" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2 text-muted"></i>Password
+                            </label>
+                            <input type="password" name="password" id="inputPassword"
+                                   class="form-control form-control-lg" autocomplete="current-password" required
+                                   placeholder="Enter your password">
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" name="_remember_me" id="rememberMe" class="form-check-input">
+                            <label class="form-check-label text-muted" for="rememberMe">
+                                Keep me signed in
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light border-0">
+                    <p class="mb-2 text-muted">New to JEMS Task Manager?</p>
+                    <a href="{{ path('app_register') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

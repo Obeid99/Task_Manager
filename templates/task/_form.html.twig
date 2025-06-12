@@ -1,0 +1,43 @@
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            {{ form_row(form.title, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.dueDate, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            {{ form_row(form.description, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+
+    {# Only show assignee fields if they exist (for admin users) #}
+    {% if form.assigneeName is defined and form.assigneeEmail is defined %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.assigneeName, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.assigneeEmail, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="form-check">
+                {{ form_widget(form.finished, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.finished, null, {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    </div>
+{{ form_end(form) }}

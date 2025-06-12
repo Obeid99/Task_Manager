@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-cogs me-2"></i>{{ title }}
+                    </h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.name) }}
+                        {{ form_widget(form.name) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.category) }}
+                            {{ form_widget(form.category) }}
+                            {{ form_errors(form.category) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_label(form.level) }}
+                            {{ form_widget(form.level) }}
+                            {{ form_errors(form.level) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.yearsOfExperience) }}
+                        {{ form_widget(form.yearsOfExperience) }}
+                        {{ form_errors(form.yearsOfExperience) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" name="save_and_return" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Skill
+                        </button>
+                        <button type="submit" name="save_and_add_another" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Save & Add Another
+                        </button>
+                        <a href="{{ path('app_user_profile') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .skill-preview {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        
+        .skill-badge-preview {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        
+        .level-beginner { background-color: #6c757d; color: white; }
+        .level-intermediate { background-color: #0dcaf0; color: white; }
+        .level-advanced { background-color: #ffc107; color: black; }
+        .level-expert { background-color: #198754; color: white; }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Live preview of skill badge
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameField = document.querySelector('#skill_form_name');
+            const levelField = document.querySelector('#skill_form_level');
+            const yearsField = document.querySelector('#skill_form_yearsOfExperience');
+            
+            function updatePreview() {
+                const name = nameField.value || 'Skill Name';
+                const level = levelField.value || 'Beginner';
+                const years = yearsField.value;
+                
+                let previewHtml = `<div class="skill-badge-preview level-${level.toLowerCase()}">
+                    ${name} <small>(${level})</small>`;
+                
+                if (years) {
+                    previewHtml += ` <small>• ${years}y</small>`;
+                }
+                
+                previewHtml += '</div>';
+                
+                let previewDiv = document.querySelector('.skill-preview');
+                if (!previewDiv) {
+                    previewDiv = document.createElement('div');
+                    previewDiv.className = 'skill-preview';
+                    previewDiv.innerHTML = '<strong>Preview:</strong><br>';
+                    yearsField.closest('.mb-3').after(previewDiv);
+                }
+                
+                previewDiv.innerHTML = '<strong>Preview:</strong><br>' + previewHtml;
+            }
+            
+            nameField.addEventListener('input', updatePreview);
+            levelField.addEventListener('change', updatePreview);
+            yearsField.addEventListener('input', updatePreview);
+            
+            updatePreview(); // Initial preview
+        });
+    </script>
+{% endblock %}

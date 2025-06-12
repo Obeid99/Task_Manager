@@ -1,0 +1,336 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Profile Header -->
+            <div class="card mb-4">
+                <div class="card-header text-center">
+                    <i class="fas fa-user-circle fa-2x mb-2"></i>
+                    <h1 class="h3 mb-0">My Profile</h1>
+                    <div class="mt-2">
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ user.profileCompletionPercentage }}%"></div>
+                        </div>
+                        <small class="text-muted">Profile {{ user.profileCompletionPercentage }}% complete</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user me-2"></i>Personal Information</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Full Name:</label>
+                                <p class="form-control-plaintext">
+                                    {{ user.fullName ?: 'Not set' }}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Username:</label>
+                                <p class="form-control-plaintext">{{ user.username }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email:</label>
+                                <p class="form-control-plaintext">{{ user.email }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">LinkedIn:</label>
+                                <p class="form-control-plaintext">
+                                    {% if user.linkedinUrl %}
+                                        <a href="{{ user.linkedinUrl }}" target="_blank" class="text-decoration-none">
+                                            <i class="fab fa-linkedin me-2"></i>{{ user.linkedinUrl }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Not set</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-briefcase me-2"></i>Work Information</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Job Title:</label>
+                                <p class="form-control-plaintext">
+                                    {{ user.jobTitle ?: 'Not set' }}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Roles:</label>
+                                <p class="form-control-plaintext">
+                                    {% for role in user.roles %}
+                                        <span class="badge bg-primary me-1">
+                                            {{ role|replace({'ROLE_': ''})|title }}
+                                        </span>
+                                    {% endfor %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        {% if isOwnProfile %}
+                            <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            </a>
+                            <a href="{{ path('app_change_password') }}" class="btn btn-warning">
+                                <i class="fas fa-key me-2"></i>Change Password
+                            </a>
+                        {% endif %}
+
+                        {% if isAdminView is defined and isAdminView %}
+                            <a href="{{ path('app_admin_users') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to User Management
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_task_index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Tasks
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV Upload Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>CV / Resume</h5>
+                    {% if isOwnProfile %}
+                        <a href="{{ path('app_profile_cv_upload') }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-upload me-1"></i>{{ user.cvUpload ? 'Replace CV' : 'Upload CV' }}
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user.cvUpload %}
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                            <div>
+                                <h6 class="mb-1">{{ user.cvUpload.originalFileName }}</h6>
+                                <small class="text-muted">
+                                    {{ user.cvUpload.fileSizeFormatted }} •
+                                    Uploaded {{ user.cvUpload.uploadedAt|date('M d, Y') }}
+                                </small>
+                            </div>
+                            <div class="ms-auto">
+                                <a href="{{ path('app_profile_cv_download') }}" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                                {% if isOwnProfile %}
+                                    <form method="post" action="{{ path('app_profile_cv_delete') }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete your CV?')">
+                                            <i class="fas fa-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-file-upload fa-3x mb-3"></i>
+                            <p>No CV uploaded yet. Upload your CV to complete your profile.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Education Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Education</h5>
+                    {% if isOwnProfile %}
+                        <div class="btn-group">
+                            <a href="{{ path('app_profile_education_add') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus me-1"></i>Add Education
+                            </a>
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ path('app_profile_education_add') }}">
+                                    <i class="fas fa-graduation-cap me-2"></i>Add Single Education
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><span class="dropdown-item-text text-muted small">
+                                    <i class="fas fa-lightbulb me-1"></i>Tip: Use "Save & Add Another" to add multiple entries quickly
+                                </span></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user.educations|length > 0 %}
+                        {% for education in user.educations %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ education.degree }} in {{ education.fieldOfStudy }}</h6>
+                                        <p class="mb-1 text-primary">{{ education.institution }}</p>
+                                        <small class="text-muted">
+                                            {{ education.startYear }} -
+                                            {{ education.isCurrentlyStudying ? 'Present' : education.endYear }}
+                                            {% if education.gpa %}
+                                                • GPA: {{ education.gpa }}
+                                            {% endif %}
+                                        </small>
+                                        {% if education.description %}
+                                            <p class="mt-2 mb-0">{{ education.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                    {% if isOwnProfile %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ path('app_profile_education_edit', {'id': education.id}) }}"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                                <li>
+                                                    <form method="post" action="{{ path('app_profile_education_delete', {'id': education.id}) }}" style="display: inline;">
+                                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this education?')">
+                                                            <i class="fas fa-trash me-2"></i>Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                            <p>No education added yet. Add your educational background to enhance your profile.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Work Experience Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Work Experience</h5>
+                    {% if isOwnProfile %}
+                        <div class="btn-group">
+                            <a href="{{ path('app_profile_experience_add') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus me-1"></i>Add Experience
+                            </a>
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ path('app_profile_experience_add') }}">
+                                    <i class="fas fa-briefcase me-2"></i>Add Single Experience
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><span class="dropdown-item-text text-muted small">
+                                    <i class="fas fa-lightbulb me-1"></i>Tip: Use "Save & Add Another" to add multiple entries quickly
+                                </span></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if user.workExperiences|length > 0 %}
+                        {% for experience in user.workExperiences %}
+                            <div class="border-bottom pb-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ experience.position }}</h6>
+                                        <p class="mb-1 text-primary">{{ experience.company }}</p>
+                                        <small class="text-muted">
+                                            {{ experience.durationString }}
+                                            {% if experience.location %}
+                                                • {{ experience.location }}
+                                            {% endif %}
+                                            {% if experience.employmentType %}
+                                                • {{ experience.employmentType }}
+                                            {% endif %}
+                                        </small>
+                                        {% if experience.description %}
+                                            <p class="mt-2 mb-0">{{ experience.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                    {% if isOwnProfile %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ path('app_profile_experience_edit', {'id': experience.id}) }}"><i class="fas fa-edit me-2"></i>Edit</a></li>
+                                                <li>
+                                                    <form method="post" action="{{ path('app_profile_experience_delete', {'id': experience.id}) }}" style="display: inline;">
+                                                        <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this work experience?')">
+                                                            <i class="fas fa-trash me-2"></i>Delete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-briefcase fa-3x mb-3"></i>
+                            <p>No work experience added yet. Add your professional experience to showcase your background.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Skills & Expertise</h5>
+                    {% if isOwnProfile %}
+                        <div class="btn-group">
+                            <a href="{{ path('app_profile_skill_add') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus me-1"></i>Add Skill
+                            </a>
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ path('app_profile_skill_add') }}">
+                                    <i class="fas fa-cogs me-2"></i>Add Single Skill
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><span class="dropdown-item-text text-muted small">
+                                    <i class="fas fa-lightbulb me-1"></i>Tip: Use "Save & Add Another" to add multiple skills quickly
+                                </span></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if skillsByCategory|length > 0 %}
+                        {% for category, skills in skillsByCategory %}
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2">{{ category }} Skills</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for skill in skills %}
+                                        <span class="badge {{ skill.levelBadgeClass }} p-2">
+                                            {{ skill.name }}
+                                            <small class="ms-1">({{ skill.level }})</small>
+                                            {% if skill.yearsOfExperience %}
+                                                <small class="ms-1">• {{ skill.yearsOfExperience }}y</small>
+                                            {% endif %}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-cogs fa-3x mb-3"></i>
+                            <p>No skills added yet. Add your skills and expertise to highlight your capabilities.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
